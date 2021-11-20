@@ -1,0 +1,75 @@
+﻿@model AttendanceModel
+@{
+    ViewData["Title"] = "Mark Attendance";
+}
+
+<style>
+    .wrap_green {
+        background-color: #92f469;
+    }
+    .wrap_red {
+        background-color: #ffd24a;
+    }
+</style>
+
+<span class="badge badge-pill badge-success">@ViewBag.message</span>
+<form asp-controller="Home" asp-action="MarkAttendance" method="post">
+    <div class="form-group">
+        <label>select subject</label>
+        <select id="subjectId" class="form-control" asp-for="SubjectId" asp-items="@(new SelectList(Model.SessionList,"Id","Name"))">
+            <option>Please select one</option>
+        </select>
+    </div>
+    <label>select abscent students</label>
+    <div class="row p-2">
+        @foreach (Student std in Model.StudentList)
+        {
+        <div class="col-md-3 p-1">
+            <div id="wrap_@std.RollNo" class="form-check wrap_green" style="border-radius: 9px">
+                <input style="display:none" name="student"  id="@std.RollNo" value="@std.RollNo" type="checkbox" class="form-check-input input_box" checked="@std.Abscent">
+                <label for="@std.RollNo" class="form-check-label p-1">@std.RollNo - @std.FullName</label>
+            </div>
+        </div>
+        }
+    </div>
+    <button type="button" onclick="submitAttendance()" class="btn btn-outline-success">Submit</button>
+</form>
+
+<script>
+    $(document).ready(function () {
+        $(".input_box").each(function () {
+            let p = $(this).attr("Id");
+            if ($(this).prop("checked") == true) {
+                $("#wrap_" + p).addClass("wrap_red");
+            }
+            else {
+                $("#wrap_" + p).removeClass("wrap_red");
+            }
+        })
+
+        $(".input_box").on("click", function () {
+            let p = $(this).attr("Id");
+            if ($(this).prop("checked") == true) {
+                $("#wrap_" + p).addClass("wrap_red");
+            }
+            else {
+                $("#wrap_" + p).removeClass("wrap_red");
+            }
+        })
+    });
+
+    function submitAttendance() {
+        let abscenties = [];
+        $(".input_box").each(function () {
+            if ($(this).prop("checked") == true) {
+                abscenties.push($(this).attr("Id"));
+            }
+        })
+        let sub = parseInt($('#subjectId').find(":selected").val());
+        $.post("/Home/MarkAttendance", { abscenties: abscenties, subject: sub },
+            function (data, status) {
+                alert(data);
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            });
+    }
+</script>

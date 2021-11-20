@@ -1,0 +1,15 @@
+﻿@model List<Student>
+@{ 
+    var data = string.Join("\n",  Model.Select(s=> $"{s.RollNo} - {s.FullName}"));
+}
+<style>
+    .multiline {
+        white-space: pre-wrap;
+    }
+</style>
+<div>
+    <label>students abscent for more than 3 subjects</label>
+    <div class="p-3"></div>
+    -----// abscenties // ----
+    <div class="multiline">@data</div>
+</div>
